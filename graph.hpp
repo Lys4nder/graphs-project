@@ -192,6 +192,77 @@ public:
         return true;
     }
 
+    int hopcroftKarp() {
+        // initialize the bipartite graph
+        std::map<int, bool> left, right;
+        for (auto const& [v, adjList] : adjMap_) {
+            left[v] = false;
+            right[v] = false;
+        }
+
+        // partition the vertices into two sets
+        for (auto const& [v, adjList] : adjMap_) {
+            if (v % 2 == 0) {
+                left[v] = true;
+            } else {
+                right[v] = true;
+            }
+        }
+
+        // initialize the matching
+        std::map<int, int> matching;
+        for (auto const& [v, adjList] : adjMap_) {
+            matching[v] = -1;
+        }
+
+        int matchingSize = 0;
+        bool foundPath;
+        do {
+            // initialize the level graph and the queue
+            std::map<int, int> level;
+            for (auto const& [v, adjList] : adjMap_) {
+                level[v] = -1;
+            }
+            std::queue<int> q;
+
+            // initialize the level of the unmatched left vertices to 0
+            for (auto const& [v, adjList] : adjMap_) {
+                if (left[v] && matching[v] == -1) {
+                    level[v] = 0;
+                    q.push(v);
+                }
+            }
+
+            // run BFS to build the level graph
+            foundPath = false;
+            while (!q.empty()) {
+                int u = q.front();
+                q.pop();
+
+                for (int v : adjMap_[u]) {
+                    if (level[matching[v]] == -1) {
+                        level[matching[v]] = level[u] + 1;
+                        if (matching[v] != -1) {
+                            q.push(matching[v]);
+                        }
+                    }
+                }
+            }
+
+            // run DFS to find an augmenting path
+            for (auto const& [v, adjList] : adjMap_) {
+                if (left[v] && matching[v] == -1) {
+                    if (hopcroftKarpDFS(v, left, right, matching, level)) {
+                        matchingSize++;
+                        foundPath = true;
+                    }
+                }
+            }
+        } while (foundPath);
+
+        return matchingSize;
+    }
+
 
     
 private:
@@ -210,6 +281,26 @@ private:
                 DFS(adj, visited);
             }
         }
+    }
+
+    bool hopcroftKarpDFS(int u, std::map<int, bool>& left, std::map<int, bool>& right,
+                         std::map<int, int>& matching, std::map<int, int>& level) {
+        if (u == -1) {
+            return true;
+        }
+
+        for (int v : adjMap_[u]) {
+            if (level[matching[v]] == level[u] + 1) {
+                if (hopcroftKarpDFS(matching[v], left, right, matching, level)) {
+                    matching[u] = v;
+                    matching[v] = u;
+                    return true;
+                }
+            }
+        }
+
+        level[u] = -1;
+        return false;
     }
 };
 

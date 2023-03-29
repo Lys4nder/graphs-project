@@ -94,11 +94,10 @@ int main()
     std::cout << "It took " << time_span.count() / 1000 << "s to create the graph\n";
     std::cout << "Waiting 3s before printing...\n";
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    //g.printGraph();
-    //g.DFS_traversal(1);
-    //g.dijkstra(6);
+    g.printGraph();
+    g.DFS_traversal(1);
+    g.dijkstra(6);
     std::cout << "Hamiltonian cycle: "<< g.hasHamiltonianCycle() << '\n';
     std::cout << "Eulerian cycle: " << g.hasEulerianCycle() << '\n';
-
-    
+    std::cout << "Matching(Hopcroft Karp): " << g.hopcroftKarp() << '\n';
 }
