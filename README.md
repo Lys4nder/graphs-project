@@ -1,6 +1,6 @@
 # C++ Graphs
 
-## Project for college
+## Project for college, analyzing social media followingship
 This project is about graph theory, in it you will find:
   - DFS Travesal
   - Dijkstra's Algorithm
